@@ -1,27 +1,34 @@
 <?php
+
 namespace Models;
 
 /**
  * Classe abstraite pour les Models permettant de centraliser les opérations communes.
- * Cette classe contient des méthodes pour la gestion des données communes comme 
- * la connexion, la recherche par ID et la suppression.
+ * Cette classe contient des méthodes génériques pour la gestion des données, telles que 
+ * la connexion à la base de données, la recherche par ID et la suppression.
+ * Elle sert de base pour tous les autres modèles de l'application.
  *
  * @package Models
  */
 abstract class AbstractModel {
     
     /**
-     * @var \PDO Instance de la connexion à la base de données
+     * Instance de la connexion à la base de données.
+     *
+     * @var \PDO
      */
     protected \PDO $db;
 
     /**
-     * @var string Nom de la table associée au modèle
+     * Nom de la table associée au modèle.
+     *
+     * @var string
      */
     protected string $table;
 
     /**
-     * Constructeur qui initialise la connexion à la base de données.
+     * Constructeur de la classe.
+     * Initialise la connexion à la base de données en utilisant la configuration.
      */
     public function __construct() {
         $database = new \Config\Database();
@@ -30,6 +37,7 @@ abstract class AbstractModel {
 
     /**
      * Méthode pour nettoyer les entrées avant de les utiliser.
+     * Évite les injections XSS et les balises HTML non désirées.
      * 
      * @param string $value La valeur à nettoyer.
      * @return string La valeur nettoyée.
@@ -39,10 +47,10 @@ abstract class AbstractModel {
     }
 
     /**
-     * Trouve une entrée par son ID.
+     * Trouve une entrée par son ID dans la table associée.
      * 
-     * @param int $id L'ID de l'entrée.
-     * @return array|null Retourne l'entrée ou null si elle n'existe pas.
+     * @param int $id L'ID de l'entrée à rechercher.
+     * @return array|null Retourne un tableau associatif de l'entrée ou null si elle n'existe pas.
      */
     public function findById(int $id): ?array {
         $query = "SELECT * FROM {$this->table} WHERE id = :id";
@@ -53,10 +61,10 @@ abstract class AbstractModel {
     }
 
     /**
-     * Supprime une entrée par son ID.
+     * Supprime une entrée par son ID dans la table associée.
      * 
-     * @param int $id L'ID de l'entrée.
-     * @return bool Retourne true si la suppression a réussi.
+     * @param int $id L'ID de l'entrée à supprimer.
+     * @return bool Retourne true si la suppression a réussi, sinon false.
      */
     public function delete(int $id): bool {
         $query = "DELETE FROM {$this->table} WHERE id = :id";
