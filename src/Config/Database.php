@@ -38,7 +38,7 @@ class Database
      *
      * @var string
      */
-    private string $password = "";
+    private string $password = "root_password";
 
     /**
      * Instance de la connexion PDO.
@@ -62,13 +62,16 @@ class Database
                 // Tentative de connexion à la base de données
                 $dsn = "mysql:host={$this->host};dbname={$this->dbname}";
                 $this->connection = new \PDO($dsn, $this->username, $this->password);
+                
+                // Définir le mode de gestion des erreurs de PDO
                 $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             } catch (\PDOException $e) {
-                // En cas d'erreur, on lance une exception
+                // En cas d'erreur, on lance une exception avec le message d'erreur
                 throw new \Exception("Connection error: " . $e->getMessage());
             }
         }
-        // Retourne la connexion
+
+        // Retourne la connexion établie
         return $this->connection;
     }
 }
