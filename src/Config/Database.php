@@ -1,31 +1,74 @@
 <?php
+
 namespace Config;
 
-class Database {
-    // Paramètres de connexion à la base de données
-    private string $host = "mysql"; // Assurez-vous que "mysql" correspond à votre nom de service Docker
+/**
+ * Classe permettant de gérer la connexion à la base de données.
+ *
+ * Cette classe utilise le pattern Singleton pour s'assurer qu'une seule connexion
+ * à la base de données existe pendant l'exécution de l'application.
+ *
+ * @package Config
+ */
+class Database
+{
+    /**
+     * Hôte de la base de données.
+     * 
+     * @var string
+     */
+    private string $host = "localhost";
+
+    /**
+     * Nom de la base de données.
+     *
+     * @var string
+     */
     private string $dbname = "todo_list_api";
+
+    /**
+     * Nom d'utilisateur pour la connexion à la base de données.
+     *
+     * @var string
+     */
     private string $username = "root";
-    private string $password = "root_password";  // Assurez-vous que ce mot de passe est correct dans votre fichier docker-compose.yml
+
+    /**
+     * Mot de passe pour la connexion à la base de données.
+     *
+     * @var string
+     */
+    private string $password = "";
+
+    /**
+     * Instance de la connexion PDO.
+     * 
+     * @var \PDO|null
+     */
     private ?\PDO $connection = null;
 
-    public function getConnection(): \PDO {
+    /**
+     * Retourne une instance de la connexion PDO.
+     * Si la connexion n'existe pas, elle est créée.
+     *
+     * @return \PDO La connexion PDO.
+     * @throws \Exception Si la connexion échoue.
+     */
+    public function getConnection(): \PDO
+    {
         // Si la connexion n'existe pas encore
         if ($this->connection === null) {
             try {
                 // Tentative de connexion à la base de données
-                $this->connection = new \PDO(
-                    "mysql:host={$this->host};dbname={$this->dbname}",
-                    $this->username,
-                    $this->password
-                );
-                // Configuration des options de PDO
+                $dsn = "mysql:host={$this->host};dbname={$this->dbname}";
+                $this->connection = new \PDO($dsn, $this->username, $this->password);
                 $this->connection->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-                $this->connection->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
             } catch (\PDOException $e) {
+                // En cas d'erreur, on lance une exception
                 throw new \Exception("Connection error: " . $e->getMessage());
             }
         }
+        // Retourne la connexion
         return $this->connection;
     }
 }
